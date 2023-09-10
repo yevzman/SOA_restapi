@@ -19,53 +19,56 @@ def check_data(data):
     return 1
 
 def get_user_from_data(data):
-    return User(name=data['user_name'], gender=data['gender'], email=data['email'], image=data['image'])
+    return User(user_name=data['user_name'], gender=data['gender'], email=data['email'], image=data['image'].encode())
 
 @app.route('/user_add', methods=['POST'])
-def IsUserExists():
+def user_add():
     global dataBase
+    print(request.json)
+    print('======================================')
     if not request.json or not check_data(request.json):
         return jsonify('{"result" : bad arguments}')
     data = request.json
     status = dataBase.add_user(get_user_from_data(data))
     
     print(status)
-    return jsonify('{"result" : ' + f'status = {status}')
+    return jsonify('{"result" : OK}')
+
+@app.route('/user_update', methods=['POST'])
+def user_update():
+    global dataBase
+    print(request.json)
+    print('======================================')
+    if not request.json or not check_data(request.json):
+        return jsonify('{"result" : bad arguments}')
+    data = request.json
+    status = dataBase.update_user(get_user_from_data(data))
+    
+    print(status)
+    return jsonify('{"result": OK}')
 
 
-# def normalize_data(value):
-#     nvalue = list(value)
-#     nvalue[0] = f'\'{nvalue[0]}\''
-#     nvalue[1] = f'\'{nvalue[1]}\''
-#     nvalue[2] = f'\'{nvalue[2]}\''
-#     nvalue[3] = f'\'{nvalue[3]}\''
-#     nvalue[4] = f'\'{nvalue[4]}\''
-#     print('(' + ", ".join(nvalue) + ')')
-#     return '(' + ", ".join(nvalue) + ')'
+@app.route('/get_user_info/<string:username>', methods=['GET'])
+def get_user_info(username):
+    global dataBase
+    print('username:', username)
+    user = dataBase.get_user(username)
+    print(user)
+    return jsonify('{"result": ' + str(user) + '}')
 
+@app.route('/user_delete/<string:username>', methods=['POST'])
+def user_delete(username):
+    global dataBase
+    print('username:', username)
+    users = dataBase.delete_user(username)
+    print(users)
+    return jsonify('{"result": OK}')
 
-# @app.route('/get_user_info/<string:username>', methods=['GET'])
-# def get_courier_by_id(username):
-#     DB_new = connect('NewMessages.sqlite3')
-#     new_messages = GET(DB_new, query)
-#     query = "DELETE FROM messages WHERE from_username == " + f'"{username}"' + \
-#             " OR to_username == " + f'"{username}"'
-#     SET(DB_new, query)
-#     DB_new.close()
-
-#     new_messages = list(map(normalize_data, new_messages))
-
-#     DB_old = connect('OldMessages.sqlite3')
-#     query = "INSERT INTO messages VALUES "
-#     for value in new_messages:
-#         print(query + value)
-#         SET(DB_old, query + value)
-#     DB_old.close()
-#     print('NEW:', new_messages)
-#     data = dict()
-#     data['new_messages'] = new_messages
-
-#     return jsonify(data)
+@app.route('/get_all_users_info', methods=['GET'])
+def get_all_users_info():
+    global dataBase
+    users = dataBase.show_all_users()
+    return jsonify('{"result": ' + str(users) + '}')
 
 
 if __name__ == '__main__':
@@ -74,18 +77,13 @@ if __name__ == '__main__':
 
 
 '''
-curl -i -H "Content-Type: application/json" -X GET\
--d '{"data": [
-    {
+curl -i -H "Content-Type: application/json" -X POST\
+-d '{
+    "user_name": "yan",
     "email": "evzman2002@mail.ru",
-    "password": "OPN1INU2002"
-    }
-    ]}' http://0.0.0.0:8080/Users
-    
+    "image": "OPN1INU2002",
+    "gender": "male"
+    }' http://0.0.0.0:8080/user_add
 
-curl -i -H "Content-Type: application/json" -X GET\
-    -d '{
-    "email" : "evzman2002@mail.ru",
-    "password" : "OPN1INU2002"
-    }' http://0.0.0.0:8080/Users
+curl http://0.0.0.0:8080/get_user_info/yan
 '''

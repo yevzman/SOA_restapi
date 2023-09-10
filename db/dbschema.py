@@ -17,7 +17,7 @@ metadata_object = MetaData()
 users_table = Table(
     "users",
     metadata_object,
-    Column("user_id", Integer, primary_key=True, nullable=False),
+    Column("user_id", Integer, primary_key=True),
     Column("user_name", String(40), nullable=False),
     Column("gender", String(15), nullable=False),
     Column("image", LargeBinary, nullable=False),
@@ -33,7 +33,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_name: Mapped[str] = mapped_column(String(40), nullable=False)
     gender: Mapped[str] = mapped_column(String(15), nullable=False)
     image: Mapped[LargeBinary] = mapped_column(LargeBinary, nullable=False)
